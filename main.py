@@ -73,7 +73,7 @@ async def handle_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # Отправляем заявку вам в личку
     # ЗАМЕНИТЕ 1234567890 НА ВАШ ТЕЛЕГРАМ ID (я позже скажу, как его узнать)
-    admin_chat_id = "1234567890"
+    admin_chat_id = "382053386"
     try:
         await context.bot.send_message(chat_id=admin_chat_id, text=admin_text, parse_mode='HTML')
         await update.message.reply_text("✅ Спасибо! Мы получили ваш номер и свяжемся с вами в ближайшее время!", reply_markup=main_menu_keyboard())
@@ -106,4 +106,5 @@ def main():
     application.run_polling()
 
 if __name__ == '__main__':
+
     main()
