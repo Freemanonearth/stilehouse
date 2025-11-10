@@ -10,6 +10,9 @@ logger = logging.getLogger(__name__)
 # Ваш токен от BotFather
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
+# Ваш Telegram ID
+ADMIN_CHAT_ID = "382053386"
+
 # Клавиатура с кнопками
 def main_menu_keyboard():
     keyboard = [
@@ -72,10 +75,8 @@ async def handle_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     
     # Отправляем заявку вам в личку
-    # ЗАМЕНИТЕ 1234567890 НА ВАШ ТЕЛЕГРАМ ID (я позже скажу, как его узнать)
-    admin_chat_id = "382053386"
     try:
-        await context.bot.send_message(chat_id=admin_chat_id, text=admin_text, parse_mode='HTML')
+        await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=admin_text, parse_mode='HTML')
         await update.message.reply_text("✅ Спасибо! Мы получили ваш номер и свяжемся с вами в ближайшее время!", reply_markup=main_menu_keyboard())
     except Exception as e:
         logger.error(f"Ошибка отправки заявки: {e}")
@@ -103,8 +104,8 @@ def main():
     application.add_handler(MessageHandler(filters.CONTACT, handle_contact))
     
     # Запускаем бота
+    logger.info("Бот запущен!")
     application.run_polling()
 
 if __name__ == '__main__':
-
     main()
