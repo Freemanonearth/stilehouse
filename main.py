@@ -1,6 +1,6 @@
 import os
 import logging
-from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
+from telegram import Update, ReplyKeyboardMarkup, KeyboardButton, InputMediaPhoto
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 
 # Настройка логирования
@@ -49,8 +49,48 @@ async def services(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # Обработчик кнопки "Наши работы"
 async def portfolio(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    portfolio_text = "Здесь будут фотографии наших построенных объектов. Пока что раздел в разработке."
-    await update.message.reply_text(portfolio_text)
+    # Сначала отправляем текст
+    portfolio_text = (
+        "🏠 <b>Наши реализованные проекты</b>\n\n"
+        "Вот примеры домов, которые мы построили для наших клиентов в Ленинградской области. "
+        "Каждый проект индивидуален и адаптирован под потребности заказчика."
+    )
+    await update.message.reply_text(portfolio_text, parse_mode='HTML')
+    
+    # Затем отправляем медиагруппу с фото
+    try:
+        # Ваши реальные фото!
+        photo_urls = [
+            "https://i.ibb.co/4ZXhSST1/photo1.jpg",
+            "https://i.ibb.co/xtFqYxv4/photo2.jpg", 
+            "https://i.ibb.co/SD0ZFh67/photo3.jpg",
+            "https://i.ibb.co/MyypsSK4/photo4.jpg",
+            "https://i.ibb.co/Kj0LQBwH/photo5.jpg",
+            "https://i.ibb.co/FLjYpTC9/photo6.jpg"
+        ]
+        
+        # Делим на группы по 4 фото (ограничение Telegram)
+        group1 = photo_urls[:4]  # Первые 4 фото
+        group2 = photo_urls[4:]  # Оставшиеся фото
+        
+        # Отправляем первую группу
+        media_group1 = []
+        for i, url in enumerate(group1):
+            caption = "🏡 Наши проекты - каркасные дома и дома из газобетона" if i == 0 else ""
+            media_group1.append(InputMediaPhoto(media=url, caption=caption))
+        
+        await update.message.reply_media_group(media=media_group1)
+        
+        # Если есть вторая группа - отправляем её
+        if group2:
+            media_group2 = []
+            for url in group2:
+                media_group2.append(InputMediaPhoto(media=url))
+            await update.message.reply_media_group(media=media_group2)
+        
+    except Exception as e:
+        logger.error(f"Ошибка отправки фото: {e}")
+        await update.message.reply_text("⚠️ Фотографии временно недоступны. Приносим извинения!")
 
 # Обработчик кнопки "Связаться с нами"
 async def contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
