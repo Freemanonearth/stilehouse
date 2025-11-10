@@ -59,7 +59,6 @@ async def portfolio(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # Затем отправляем медиагруппу с фото
     try:
-        # Ваши реальные фото!
         photo_urls = [
             "https://i.ibb.co/4ZXhSST1/photo1.jpg",
             "https://i.ibb.co/xtFqYxv4/photo2.jpg", 
@@ -69,9 +68,9 @@ async def portfolio(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "https://i.ibb.co/FLjYpTC9/photo6.jpg"
         ]
         
-        # Делим на группы по 4 фото (ограничение Telegram)
-        group1 = photo_urls[:4]  # Первые 4 фото
-        group2 = photo_urls[4:]  # Оставшиеся фото
+        # Делим на группы по 4 фото
+        group1 = photo_urls[:4]
+        group2 = photo_urls[4:]
         
         # Отправляем первую группу
         media_group1 = []
@@ -94,6 +93,7 @@ async def portfolio(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # Обработчик кнопки "Связаться с нами"
 async def contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.info("Пользователь нажал 'Связаться с нами'")
     contact_text = (
         "Чтобы мы могли оперативно связаться с вами для консультации и замера, пожалуйста, поделитесь вашим номером телефона.\n\n"
         "Нажмите кнопку ниже 👇"
@@ -103,49 +103,14 @@ async def contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # Обработчик получения контакта
 async def handle_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.info("=== ПОЛУЧЕН КОНТАКТ! ===")
+    
     contact = update.message.contact
     user = update.message.from_user
     
-    # Сообщение для админа (вас)
+    logger.info(f"Контакт: {contact.first_name}, тел: +{contact.phone_number}")
+    logger.info(f"Пользователь: {user.username}, ID: {user.id}")
+    
+    # Сообщение для админа
     admin_text = (
-        "🔥 <b>НОВАЯ ЗАЯВКА!</b>\n\n"
-        f"Имя: {contact.first_name}\n"
-        f"Телефон: +{contact.phone_number}\n"
-        f"Username: @{user.username if user.username else 'не указан'}"
-    )
-    
-    # Отправляем заявку вам в личку
-    try:
-        await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=admin_text, parse_mode='HTML')
-        await update.message.reply_text("✅ Спасибо! Мы получили ваш номер и свяжемся с вами в ближайшее время!", reply_markup=main_menu_keyboard())
-    except Exception as e:
-        logger.error(f"Ошибка отправки заявки: {e}")
-        await update.message.reply_text("✅ Спасибо! Мы свяжемся с вами скоро.", reply_markup=main_menu_keyboard())
-
-# Обработчик текстовых сообщений
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = update.message.text
-    if text == "📋 Услуги и Цены":
-        await services(update, context)
-    elif text == "🏠 Наши работы":
-        await portfolio(update, context)
-    elif text == "📞 Связаться с нами":
-        await contact(update, context)
-    else:
-        await update.message.reply_text("Пожалуйста, используйте кнопки меню 👇", reply_markup=main_menu_keyboard())
-
-def main():
-    # Создаем приложение
-    application = Application.builder().token(TOKEN).build()
-    
-    # Добавляем обработчики
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-    application.add_handler(MessageHandler(filters.CONTACT, handle_contact))
-    
-    # Запускаем бота
-    logger.info("Бот запущен!")
-    application.run_polling()
-
-if __name__ == '__main__':
-    main()
+        "
